@@ -6,11 +6,11 @@ import java.util.UUID
 
 object algebra {
   trait AddressRepository[F[_]] {
-      def createAddress(addr: CreateAddressRequest): F[Either[String, Address]]
+    def createAddress(addr: CreateAddressRequest): F[Either[String, Address]]
 
-      def findAll: F[List[Address]]
+    def findAll: F[List[Address]]
 
-      def find(id: UUID): F[Option[Address]]
+    def find(id: UUID): F[Option[Address]]
   }
 
   trait ProviderRepository[F[_]] {

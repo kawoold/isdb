@@ -8,7 +8,7 @@ import isdb.http.AddressHttpRoutes
 
 object AddressGenerator {
 
-  val addressComponent: Gen[AddressComponent]= for {
+  val addressComponent: Gen[AddressComponent] = for {
     longName <- nonEmptyStringGen
     shortName <- nonEmptyStringGen
     types <- Gen.listOf(nonEmptyStringGen)

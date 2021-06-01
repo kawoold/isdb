@@ -46,7 +46,8 @@ object address {
     } yield Address(id, line1, line2, state, zip, dto._6)
   }
 
-  type CreateAddressRequest = (String Refined NonEmpty, Option[String Refined NonEmpty], State, ZipCode, Option[GeocodingResults])
+  type CreateAddressRequest =
+    (String Refined NonEmpty, Option[String Refined NonEmpty], State, ZipCode, Option[GeocodingResults])
 
   implicit class CreateAddressConversions(req: CreateAddressRequest) {
     def toTraceable: AttributeValue.StringList = AttributeValue.StringList(

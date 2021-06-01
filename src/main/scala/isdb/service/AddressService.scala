@@ -11,7 +11,9 @@ import isdb.models.address._
 import isdb.models.errors._
 import io.janstenpickle.trace4cats.model.SpanKind
 
-class AddressService[F[_]: Async: MonadThrow: Trace](addressRepo: AddressRepository[F], geo: GeocodingFinder[F])(implicit L: Logger[F]) {
+class AddressService[F[_]: Async: MonadThrow: Trace](addressRepo: AddressRepository[F], geo: GeocodingFinder[F])(
+    implicit L: Logger[F]
+) {
 
   def findAddress(id: UUID): F[Option[Address]] = Trace[F].span("address-find", SpanKind.Server) {
     for {
@@ -29,7 +31,7 @@ class AddressService[F[_]: Async: MonadThrow: Trace](addressRepo: AddressReposit
       _ <- L.debug(s"Address Creation Result: $resultAttempt")
       result <- resultAttempt match {
         case Left(err) => Async[F].raiseError(CreateError(err))
-        case Right(r) => Async[F].delay(r)
+        case Right(r)  => Async[F].delay(r)
       }
       _ <- L.debug(geoResult.toString())
     } yield result

@@ -24,7 +24,8 @@ trait GeocodingFinder[F[_]] {
 class GoogleGeocodingFinder[F[_]: Async: Trace](
     config: Configuration,
     client: Client[F]
-)(implicit L: Logger[F]) extends GeocodingFinder[F] {
+)(implicit L: Logger[F])
+    extends GeocodingFinder[F] {
 
   implicit def createDecoder[A: Decoder]: EntityDecoder[F, A] = jsonOf[F, A]
 
@@ -37,8 +38,10 @@ class GoogleGeocodingFinder[F[_]: Async: Trace](
     val target = (baseUrlLens.get(config) / "maps" / "api" / "geocode" / "json")
       .withQueryParam("address", address)
       .withQueryParam("key", apiKeyLens.get(config))
-    client.expect[GeocodingResults](target).recoverWith({
-      case th => L.error(s"Failed to get geocoding results for $address: ${th.getMessage}", th) *> Async[F].raiseError(th)
-    })
+    client
+      .expect[GeocodingResults](target)
+      .recoverWith({ case th =>
+        L.error(s"Failed to get geocoding results for $address: ${th.getMessage}", th) *> Async[F].raiseError(th)
+      })
   }
 }

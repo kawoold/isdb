@@ -13,17 +13,17 @@ import io.janstenpickle.trace4cats.model.SpanKind
 
 class ProviderService[F[_]: Async: MonadThrow: Trace](repo: algebra.ProviderRepository[F])(implicit L: Logger[F]) {
   def findProvider(id: UUID): F[Option[Provider]] = Trace[F].span("provider-find", SpanKind.Server) {
-      repo.find(id)
+    repo.find(id)
   }
 
   def findAllProviders(): F[List[Provider]] = Trace[F].span("provider-find-all", SpanKind.Server) {
-      repo.findAll
+    repo.findAll
   }
 
   def insertProvider(req: CreateProviderRequest): F[Provider] = Trace[F].span("provider-insert", SpanKind.Server) {
-      repo.createProvider(req) flatMap {
-          case Left(err) => Async[F].raiseError(CreateError(err))
-          case Right(provider) => Async[F].delay(provider)
-      }
+    repo.createProvider(req) flatMap {
+      case Left(err)       => Async[F].raiseError(CreateError(err))
+      case Right(provider) => Async[F].delay(provider)
+    }
   }
 }

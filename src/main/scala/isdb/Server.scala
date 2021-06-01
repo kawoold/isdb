@@ -52,11 +52,15 @@ class HttpServer[F[_]: ContextShift: ConcurrentEffect: Timer: Monad] {
       entry <- ep.root("isdb-service")
       client <- BlazeClientBuilder[F](ec).resource
     } yield {
-      Configuration.config[Kleisli[F, Span[F], *]].run(entry).map(cfg => {
-        val module = new Module[Kleisli[F, Span[F], *]](cfg, client.liftTrace())
-        val serverBuilder = BlazeServerBuilder[F](ec).bindHttp(cfg.serverPort.value, "0.0.0.0").withHttpApp(module.httpApp.inject(ep))
-        serverBuilder.serve
-      })
+      Configuration
+        .config[Kleisli[F, Span[F], *]]
+        .run(entry)
+        .map(cfg => {
+          val module = new Module[Kleisli[F, Span[F], *]](cfg, client.liftTrace())
+          val serverBuilder =
+            BlazeServerBuilder[F](ec).bindHttp(cfg.serverPort.value, "0.0.0.0").withHttpApp(module.httpApp.inject(ep))
+          serverBuilder.serve
+        })
     }
   }
 }

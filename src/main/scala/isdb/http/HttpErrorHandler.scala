@@ -22,8 +22,8 @@ import org.http4s.HttpVersion
 import org.http4s.MessageFailure
 
 class HttpErrorHandler[F[_]: Async] extends Http4sDsl[F] {
-  val handle: Throwable => F[Response[F]] = {
-    case f: MessageFailure       => Async[F].delay(f.toHttpResponse(HttpVersion.`HTTP/2.0`))
+  val handle: Throwable => F[Response[F]] = { case f: MessageFailure =>
+    Async[F].delay(f.toHttpResponse(HttpVersion.`HTTP/2.0`))
   }
 
   def handleRoute(routes: HttpRoutes[F]): HttpRoutes[F] = Kleisli { req: Request[F] =>

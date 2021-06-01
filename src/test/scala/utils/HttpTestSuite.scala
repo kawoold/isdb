@@ -20,7 +20,9 @@ trait HttpTestSuite extends PureTestSuite with CirceInstances {
 
   private val H: HttpErrorHandler[IO] = new HttpErrorHandler[IO]
 
-  def assertHttp[A: Encoder](routes: HttpRoutes[IO], req: Request[IO])(expectedStatus: Status, expectedBody: A)(implicit L: Logger[IO]): IO[Assertion] = {
+  def assertHttp[A: Encoder](routes: HttpRoutes[IO], req: Request[IO])(expectedStatus: Status, expectedBody: A)(implicit
+      L: Logger[IO]
+  ): IO[Assertion] = {
     L.debug(req.asCurl())
     H.handleRoute(routes).run(req).value.flatMap {
       case Some(resp) =>
@@ -28,12 +30,15 @@ trait HttpTestSuite extends PureTestSuite with CirceInstances {
           assert(resp.status === expectedStatus && json.dropNullValues === expectedBody.asJson.dropNullValues)
         }
       case None => fail("Route Not Found")
-    } handleErrorWith {
-      th => fail(s"Unexpected error: ${th.getMessage}")
+    } handleErrorWith { th =>
+      fail(s"Unexpected error: ${th.getMessage}")
     }
   }
 
-  def assertResult[A: Encoder: Decoder](routes: HttpRoutes[IO], req: Request[IO])(expectedStatus: Status, assertions: A => Assertion)(implicit L: Logger[IO]): IO[Assertion] = {
+  def assertResult[A: Encoder: Decoder](
+      routes: HttpRoutes[IO],
+      req: Request[IO]
+  )(expectedStatus: Status, assertions: A => Assertion)(implicit L: Logger[IO]): IO[Assertion] = {
     L.debug(req.asCurl())
     H.handleRoute(routes).run(req).value.flatMap {
       case Some(resp) => {
@@ -41,18 +46,20 @@ trait HttpTestSuite extends PureTestSuite with CirceInstances {
         resp.as[A].map(assertions)
       }
       case None => fail("Route Not Found")
-    } handleErrorWith {
-      th => fail(s"Unexpected error: ${th.getMessage}")
+    } handleErrorWith { th =>
+      fail(s"Unexpected error: ${th.getMessage}")
     }
   }
 
-  def assertHttpStatus(routes: HttpRoutes[IO], req: Request[IO])(expectedStatus: Status)(implicit L: Logger[IO]): IO[Assertion] = {
+  def assertHttpStatus(routes: HttpRoutes[IO], req: Request[IO])(
+      expectedStatus: Status
+  )(implicit L: Logger[IO]): IO[Assertion] = {
     L.debug(req.asCurl())
     H.handleRoute(routes).run(req).value.map {
       case Some(resp) => assert(resp.status === expectedStatus)
       case None       => fail("Route Not Found")
-    } handleErrorWith {
-      th => fail(s"Unexpected error: ${th.getMessage}")
+    } handleErrorWith { th =>
+      fail(s"Unexpected error: ${th.getMessage}")
     }
   }
 
@@ -61,8 +68,8 @@ trait HttpTestSuite extends PureTestSuite with CirceInstances {
     H.handleRoute(routes).run(req).value.attempt.map {
       case Left(_)  => assert(true)
       case Right(_) => fail("Expected a failure")
-    } handleErrorWith {
-      th => fail(s"Unexpected error: ${th.getMessage}")
+    } handleErrorWith { th =>
+      fail(s"Unexpected error: ${th.getMessage}")
     }
   }
 }

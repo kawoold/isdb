@@ -56,12 +56,12 @@ final case class Configuration(
 object Configuration {
   private implicit val logLevelDecoder: ConfigDecoder[String, Level] = ConfigDecoder[String].mapOption("Level") { str =>
     str.toLowerCase match {
-      case "info" => Some(Level.Info)
+      case "info"  => Some(Level.Info)
       case "debug" => Some(Level.Debug)
       case "error" => Some(Level.Error)
       case "trace" => Some(Level.Trace)
-      case "warn" => Some(Level.Warn)
-      case _ => None
+      case "warn"  => Some(Level.Warn)
+      case _       => None
     }
   }
 
