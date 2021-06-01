@@ -2,4 +2,4 @@
 *.log
 .bloop/
 .metals/
-.vscode
+.vscode/
