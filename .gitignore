@@ -3,3 +3,5 @@
 .bloop/
 .metals/
 .vscode/
+target/
+zk-single-kafka-single/
