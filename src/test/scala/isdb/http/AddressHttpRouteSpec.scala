@@ -69,6 +69,32 @@ class AddressHttpRouteSpec extends HttpTestSuite {
     }
   }
 
+  spec("Address lookup should return Forbidden if the user is not authorized") {
+    implicit val deniedSec: Security[IO] = makeTestSecurity(false)
+    val addressRoutes: HttpRoutes[IO] = new AddressHttpRoutes[IO](
+      new AddressService(
+        testAddressRepository(Nil, () => Gen.uuid.sample.get),
+        testGeoFinder(AddressGenerator.geocodingResults.sample.get)
+      )
+    ).routes
+    GET(Uri.uri("/address")).flatMap { req =>
+      assertHttpStatus(addressRoutes, req.putHeaders(Header("Authorization", createToken)))(Status.Forbidden)
+    }
+  }
+
+  spec("Address lookup should return Forbidden if the user does not include an authorization header") {
+    implicit val deniedSec: Security[IO] = makeTestSecurity(false)
+    val addressRoutes: HttpRoutes[IO] = new AddressHttpRoutes[IO](
+      new AddressService(
+        testAddressRepository(Nil, () => Gen.uuid.sample.get),
+        testGeoFinder(AddressGenerator.geocodingResults.sample.get)
+      )
+    ).routes
+    GET(Uri.uri("/address")).flatMap { req =>
+      assertHttpStatus(addressRoutes, req)(Status.Forbidden)
+    }
+  }
+
   forAll(AddressGenerator.geocodingResults) { geoResults =>
     implicit val allowedSec: Security[IO] = makeTestSecurity(true)
     spec("Address lookup should return an empty list if no addresses have been added") {
