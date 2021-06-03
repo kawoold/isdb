@@ -12,7 +12,7 @@ import org.http4s.EntityEncoder
 
 object errors {
   sealed trait ApiError extends RuntimeException with Product with Serializable
-  case class CreateError(error: String) extends ApiError with MessageFailure {
+  final case class CreateError(error: String) extends ApiError with MessageFailure {
 
     def cause: Option[Throwable] = Some(this)
 
@@ -22,7 +22,7 @@ object errors {
       Response(Status.BadRequest, httpVersion)
         .withEntity(message)
   }
-  case class EntryNotFound(key: String) extends ApiError with MessageFailure {
+  final case class EntryNotFound(key: String) extends ApiError with MessageFailure {
     def cause: Option[Throwable] = Some(this)
 
     def message: String = s"No entry found for $key"
@@ -31,7 +31,7 @@ object errors {
       Response(Status.NotFound, httpVersion)
         .withEntity(message)
   }
-  case class ParseError(errors: NonEmptyList[String]) extends ApiError with MessageFailure {
+  final case class ParseError(errors: NonEmptyList[String]) extends ApiError with MessageFailure {
     def cause: Option[Throwable] = Some(this)
 
     def message: String = s"Could not parse data: ${Show[NonEmptyList[String]].show(errors)}"

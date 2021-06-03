@@ -73,45 +73,13 @@ class AddressHttpRoutes[F[_]: Async: MonadThrow: Trace](addressService: AddressS
     }
   }
 
-  // private val authRoutes: AuthedRoutes[UserData, F] = AuthedRoutes.of {
-  //   case GET -> Root / "address" as user if user hasRole "view-addresses" => {
-  //     for {
-  //       addresses <- addressService.findAll
-  //       traceId <- Trace[F].traceId.map(_.getOrElse(""))
-  //       response <- Ok(addresses.asJson, Header("X-Trace-Id", traceId))
-  //     } yield response
-  //   }
-  //   case GET -> Root / "address" / UuidVar(id) as user if user hasRole "view-addresses" => {
-  //     for {
-  //       address <- addressService
-  //         .findAddress(id)
-  //         .flatMap(_.fold(MonadThrow[F].raiseError[Address](EntryNotFound(id.toString())))(Async[F].delay(_)))
-  //       traceId <- Trace[F].traceId.map(_.getOrElse(""))
-  //       response <- Ok(address.asJson, Header("X-Trace-Id", traceId))
-  //     } yield response
-  //   }
-
-  //   case ar @ POST -> Root / "address" as user if user hasRole "submit-addresses" => {
-  //     ar.req.decode[CreateAddress] { createAddress =>
-  //       for {
-  //         _ <- L.info(s"Received request to add $createAddress")
-  //         validatedRequest <- toCreateRequest[F](createAddress)
-  //         result <- validatedRequest
-  //           .fold[F[Address]](errs => Async[F].raiseError(ParseError(errs)), addressService.insertAddress)
-  //         traceId <- Trace[F].traceId.map(_.getOrElse(""))
-  //         response <- Ok(result.asJson, Header("X-Trace-Id", traceId))
-  //       } yield response
-  //     }
-  //   }
-  // }
-
   val routes: HttpRoutes[F] = Router(
     "/address" -> (viewAddressMiddleware(viewRoutes) <+> submitAddressMiddleware(submitRoutes))
   )
 }
 
 object AddressHttpRoutes {
-  case class CreateAddress(
+  final case class CreateAddress(
       line1: String,
       line2: Option[String],
       state: String,

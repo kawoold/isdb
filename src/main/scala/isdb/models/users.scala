@@ -9,8 +9,8 @@ import io.circe.refined._
 import io.circe.derivation._
 
 object users {
-  case class Roles(roles: List[String Refined NonEmpty])
-  case class UserData(
+  final case class Roles(roles: List[String Refined NonEmpty])
+  final case class UserData(
       jti: UUID,
       iss: String Refined NonEmpty,
       aud: String Refined NonEmpty,

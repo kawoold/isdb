@@ -50,7 +50,7 @@ object providers {
     )
   }
 
-  case class Provider(id: UUID, name: String Refined NonEmpty, url: String Refined Url, serviceType: ServiceType)
+  final case class Provider(id: UUID, name: String Refined NonEmpty, url: String Refined Url, serviceType: ServiceType)
 
   type ProviderDTO = (String, String, String, ServiceType)
 

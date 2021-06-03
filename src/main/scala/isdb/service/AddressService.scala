@@ -10,6 +10,7 @@ import java.util.UUID
 import isdb.models.address._
 import isdb.models.errors._
 import io.janstenpickle.trace4cats.model.SpanKind
+import cats.Show
 
 class AddressService[F[_]: Async: MonadThrow: Trace](addressRepo: AddressRepository[F], geo: GeocodingFinder[F])(
     implicit L: Logger[F]
@@ -33,7 +34,7 @@ class AddressService[F[_]: Async: MonadThrow: Trace](addressRepo: AddressReposit
         case Left(err) => Async[F].raiseError(CreateError(err))
         case Right(r)  => Async[F].delay(r)
       }
-      _ <- L.debug(geoResult.toString())
+      _ <- L.debug(geoResult)
     } yield result
   }
 

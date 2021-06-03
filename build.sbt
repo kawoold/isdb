@@ -19,7 +19,7 @@ lazy val EnumeratumVersion    = "1.6.1"
 lazy val MonocleVersion       = "3.0.0-M5"
 lazy val Http4sJwtVersion     = "0.0.6"
 
-wartremoverErrors ++= Warts.all
+wartremoverErrors in (Compile, compile) ++= Warts.allBut(Wart.Any, Wart.StringPlusAny, Wart.Nothing)
 
 addCompilerPlugin("org.typelevel" % "kind-projector" % KindProjectorVersion cross CrossVersion.full)
 

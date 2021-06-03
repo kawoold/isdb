@@ -19,6 +19,8 @@ import io.janstenpickle.trace4cats.Span
 import io.janstenpickle.trace4cats.inject.Trace
 import io.odin.Level
 import org.http4s.Uri
+import cats.Show
+import java.util.Locale
 
 sealed trait AppEnvironment extends EnumEntry
 
@@ -43,6 +45,10 @@ final case class DatabaseConfig(
   val connectionUrl: NonEmptyString = NonEmptyString.unsafeFrom(s"jdbc:postgresql://$host:$port/$dbName")
 }
 
+object DatabaseConfig {
+  implicit val dbConfigShow: Show[DatabaseConfig] = Show.fromToString
+}
+
 final case class GeocodingConfig(baseUrl: Uri, apiKey: Secret[NonEmptyString])
 
 final case class Configuration(
@@ -55,7 +61,7 @@ final case class Configuration(
 
 object Configuration {
   private implicit val logLevelDecoder: ConfigDecoder[String, Level] = ConfigDecoder[String].mapOption("Level") { str =>
-    str.toLowerCase match {
+    str.toLowerCase(Locale.US) match {
       case "info"  => Some(Level.Info)
       case "debug" => Some(Level.Debug)
       case "error" => Some(Level.Error)
@@ -64,6 +70,8 @@ object Configuration {
       case _       => None
     }
   }
+
+  implicit val configShow: Show[Configuration] = Show.fromToString
 
   def configResource[F[_]: Async: ContextShift: Trace]: Resource[F, Configuration] =
     Resource.make(Trace[F].span("config-load")(config[F])) { _ =>
@@ -89,7 +97,7 @@ object Configuration {
         }
       }
       .load[F]
-      .flatTap(cfg => Trace[F].put("cfg-result", cfg.toString()))
+      .flatTap(cfg => Trace[F].put("cfg-result", Show[Configuration].show(cfg)))
   }
 
   def geocodingConfig(environment: AppEnvironment): ConfigValue[GeocodingConfig] = {
@@ -110,7 +118,7 @@ object Configuration {
           env("DB_PORT").or(prop("db.port")).as[UserPortNumber].default(5432),
           env("DB_HOST").or(prop("db.host")).as[NonEmptyString].default("localhost"),
           env("DB_NAME").or(prop("db.name")).as[NonEmptyString].default("postgres")
-        ).parMapN(DatabaseConfig)
+        ).parMapN(DatabaseConfig.apply)
       }
       case Dev => {
         (
@@ -119,7 +127,7 @@ object Configuration {
           env("DB_PORT").or(prop("db.port")).as[UserPortNumber].default(5432),
           env("DB_HOST").or(prop("db.host")).as[NonEmptyString].default("localhost"),
           env("DB_NAME").or(prop("db.name")).as[NonEmptyString].default("users")
-        ).parMapN(DatabaseConfig)
+        ).parMapN(DatabaseConfig.apply)
       }
     }
   }

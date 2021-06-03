@@ -21,7 +21,6 @@ import org.http4s.client.blaze.BlazeClientBuilder
 import cats.data
 
 object Server extends IOApp {
-
   def entryPoint[F[_]: Concurrent: ContextShift: Timer](
       blocker: Blocker,
       process: TraceProcess
@@ -35,7 +34,7 @@ object Server extends IOApp {
     val serverResource: Resource[IO, fs2.Stream[IO, ExitCode]] = for {
       blocker <- Blocker[IO]
       ep <- entryPoint[IO](blocker, TraceProcess("isdb"))
-      appServer = new HttpServer[IO]
+      appServer = new HttpServer[IO](executionContext)
       server <- appServer.server(ep)
       s <- Resource.eval(server)
     } yield s
@@ -44,10 +43,9 @@ object Server extends IOApp {
   }
 }
 
-class HttpServer[F[_]: ContextShift: ConcurrentEffect: Timer: Monad] {
+class HttpServer[F[_]: ContextShift: ConcurrentEffect: Timer: Monad](ec: ExecutionContext) {
 
   def server(ep: EntryPoint[F]): Resource[F, F[fs2.Stream[F, ExitCode]]] = {
-    val ec: ExecutionContext = ExecutionContext.global
     for {
       entry <- ep.root("isdb-service")
       client <- BlazeClientBuilder[F](ec).resource

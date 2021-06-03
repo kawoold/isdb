@@ -60,7 +60,7 @@ class ProviderHttpRoutes[F[_]: Async: MonadThrow: Trace](providerService: Provid
 }
 
 object ProviderHttpRoutes {
-  case class CreateProvider(name: String, url: String, serviceType: ServiceType)
+  final case class CreateProvider(name: String, url: String, serviceType: ServiceType)
 
   def toCreateRequest[F[_]: Async](unvalidated: CreateProvider): F[ValidatedNel[String, CreateProviderRequest]] = {
     val refinements = (

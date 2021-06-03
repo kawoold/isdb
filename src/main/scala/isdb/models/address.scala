@@ -19,13 +19,14 @@ import io.circe.derivation._
 import doobie.postgres.circe.json.implicits._
 import doobie.util.Get
 import doobie.util.Put
+import io.odin.meta.Render
 
 object address {
   type State = String Refined MatchesRegex[W.`"[A-Z]{2}"`.T]
 
   type ZipCode = String Refined MatchesRegex[W.`"[0-9]{5}(-[0-9]{4})?"`.T]
 
-  case class Address(
+  final case class Address(
       id: UUID,
       line1: String Refined NonEmpty,
       line2: Option[String Refined NonEmpty],
@@ -67,7 +68,7 @@ object address {
     ).flatten.mkString(", ")
   }
 
-  case class AddressComponent(
+  final case class AddressComponent(
       longName: String Refined NonEmpty,
       shortName: String Refined NonEmpty,
       types: List[String Refined NonEmpty]
@@ -78,21 +79,21 @@ object address {
   implicit val addressCompGet: Get[AddressComponent] = pgDecoderGet
   implicit val addressCompPut: Put[AddressComponent] = pgEncoderPut
 
-  case class LocationPoint(lat: Double, lng: Double)
+  final case class LocationPoint(lat: Double, lng: Double)
 
   implicit val pointCodec: Codec[LocationPoint] = deriveCodec(derivation.renaming.snakeCase)
 
   implicit val pointGet: Get[LocationPoint] = pgDecoderGet
   implicit val pointPut: Put[LocationPoint] = pgEncoderPut
 
-  case class LocationBounds(northeast: LocationPoint, southwest: LocationPoint)
+  final case class LocationBounds(northeast: LocationPoint, southwest: LocationPoint)
 
   implicit val boundsCodec: Codec[LocationBounds] = deriveCodec(derivation.renaming.snakeCase)
 
   implicit val boundsGet: Get[LocationBounds] = pgDecoderGet
   implicit val boundsPut: Put[LocationBounds] = pgEncoderPut
 
-  case class LocationGeometry(
+  final case class LocationGeometry(
       bounds: LocationBounds,
       location: LocationPoint,
       locationType: String Refined NonEmpty,
@@ -104,7 +105,7 @@ object address {
   implicit val geometryGet: Get[LocationGeometry] = pgDecoderGet
   implicit val geometryPut: Put[LocationGeometry] = pgEncoderPut
 
-  case class GeocodingResult(
+  final case class GeocodingResult(
       addressComponents: List[AddressComponent],
       formattedAddress: String Refined NonEmpty,
       geometry: LocationGeometry,
@@ -118,7 +119,9 @@ object address {
   implicit val resultGet: Get[GeocodingResult] = pgDecoderGet
   implicit val resultPut: Put[GeocodingResult] = pgEncoderPut
 
-  case class GeocodingResults(results: List[GeocodingResult], status: String Refined NonEmpty)
+  final case class GeocodingResults(results: List[GeocodingResult], status: String Refined NonEmpty)
+
+  implicit val geoResultsShow: Show[GeocodingResults] = Show.fromToString
 
   implicit val resultsCodec: Codec[GeocodingResults] = deriveCodec(derivation.renaming.snakeCase)
 
