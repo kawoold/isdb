@@ -1,6 +1,7 @@
 
 lazy val CatsEffectVersion    = "2.3.1"
 lazy val Fs2Version           = "2.5.0"
+lazy val Fs2KafkaVersion      = "1.7.0"
 lazy val Http4sVersion        = "0.21.20"
 lazy val CirceVersion         = "0.12.3"
 lazy val DoobieVersion        = "0.12.1"
@@ -40,6 +41,7 @@ lazy val root = (project in file("."))
     libraryDependencies ++= Seq(
       "org.typelevel"   %% "cats-effect"         % CatsEffectVersion,
       "co.fs2"          %% "fs2-core"            % Fs2Version,
+      "com.github.fd4s" %% "fs2-kafka"           % Fs2KafkaVersion,
 
       "org.http4s"                  %% "http4s-blaze-server"  % Http4sVersion,
       "org.http4s"                  %% "http4s-blaze-client"  % Http4sVersion,
