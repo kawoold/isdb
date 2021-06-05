@@ -77,6 +77,8 @@ lazy val root = (project in file("."))
       "io.janstenpickle"  %% "trace4cats-jaeger-thrift-exporter"  % Trace4CatsVersion,
       "io.janstenpickle"  %% "trace4cats-http4s-server"           % Trace4CatsVersion,
       "io.janstenpickle"  %% "trace4cats-http4s-client"           % Trace4CatsVersion,
+      "io.janstenpickle"  %% "trace4cats-fs2"                     % Trace4CatsVersion,
+      "io.janstenpickle"  %% "trace4cats-kafka-client"            % Trace4CatsVersion,
       "com.beachape"      %% "enumeratum"                         % EnumeratumVersion,
       "com.beachape"      %% "enumeratum-circe"                   % EnumeratumVersion,
 
