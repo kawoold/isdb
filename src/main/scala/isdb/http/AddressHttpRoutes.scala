@@ -49,9 +49,7 @@ class AddressHttpRoutes[F[_]: Async: MonadThrow: Trace](addressService: AddressS
     }
     case GET -> Root / UuidVar(id) as user => {
       for {
-        address <- addressService
-          .findAddress(id)
-          .flatMap(_.fold(MonadThrow[F].raiseError[Address](EntryNotFound(id.toString())))(Async[F].delay(_)))
+        address <- addressService.findAddress(id).flatMap(_.liftTo[F](EntryNotFound(id)))
         traceId <- Trace[F].traceId.map(_.getOrElse(""))
         response <- Ok(address.asJson, Header("X-Trace-Id", traceId))
       } yield response

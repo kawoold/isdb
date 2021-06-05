@@ -2,6 +2,7 @@ package isdb.models
 
 import cats.data.NonEmptyList
 import cats.Show
+import cats.syntax.show._
 import org.http4s.MessageFailure
 import org.http4s.{HttpVersion, Response}
 import org.http4s.Status
@@ -22,10 +23,10 @@ object errors {
       Response(Status.BadRequest, httpVersion)
         .withEntity(message)
   }
-  final case class EntryNotFound(key: String) extends ApiError with MessageFailure {
+  final case class EntryNotFound[T: Show](key: T) extends ApiError with MessageFailure {
     def cause: Option[Throwable] = Some(this)
 
-    def message: String = s"No entry found for $key"
+    def message: String = s"No entry found for ${key.show}"
 
     def toHttpResponse[F[_]](httpVersion: HttpVersion): Response[F] =
       Response(Status.NotFound, httpVersion)

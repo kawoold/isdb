@@ -79,7 +79,7 @@ private object AddressStatements {
   val findAll: Query0[AddressDTO] = sql"$selectAddress".query[AddressDTO]
 
   def findAddress(id: UUID): ConnectionIO[Option[AddressDTO]] =
-    sql"$selectAddress WHERE id=${id.toString()}".query[AddressDTO].option
+    sql"$selectAddress WHERE id=$id".query[AddressDTO].option
 
   def insertAddress(addr: CreateAddressRequest): ConnectionIO[AddressDTO] = {
     val statement = sql"""
