@@ -4,5 +4,6 @@
 .bsp/
 .metals/
 .vscode/
+.idea/
 target/
 zk-single-kafka-single/

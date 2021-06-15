@@ -3,36 +3,23 @@ package isdb
 import cats.effect._
 import cats.syntax.all._
 import doobie.util.transactor.Transactor
+import fs2.kafka.CommittableConsumerRecord
+import io.janstenpickle.trace4cats.fs2.TracedStream
 import io.janstenpickle.trace4cats.inject.Trace
-import io.odin.Level
 import io.odin._
-import io.circe.parser._
 import isdb.config.Configuration
-import isdb.http.AddressHttpRoutes
-import isdb.http.HttpErrorHandler
-import isdb.http.ProviderHttpRoutes
-import isdb.repository.PostgresAddressRepository
-import isdb.repository.PostgresProviderRepository
-import isdb.repository.algebra
-import isdb.service.AddressService
-import isdb.service.ProviderService
-import org.http4s.HttpApp
-import org.http4s.HttpRoutes
-import org.http4s.implicits._
+import isdb.http.{AddressHttpRoutes, HttpErrorHandler, ProviderHttpRoutes}
+import isdb.repository.{PostgresAddressRepository, PostgresProviderRepository, algebra}
+import isdb.service._
+import org.http4s.{HttpApp, HttpRoutes}
 import org.http4s.client.Client
-import org.http4s.client.blaze.BlazeClientBuilder
-import scala.concurrent.ExecutionContext
-import cats.Monad
-import isdb.service.GeocodingFinder
-import isdb.service.GoogleGeocodingFinder
-import dev.profunktor.auth.JwtAuthMiddleware
-import isdb.models.users._
-import dev.profunktor.auth.jwt._
-import org.http4s.server.AuthMiddleware
-import io.janstenpickle.trace4cats.model.SpanKind
-import isdb.service.Security
+import org.http4s.implicits._
 
-class Module[F[_]: Concurrent: ContextShift: Timer: Trace](config: Configuration, client: Client[F]) {
+class Module[F[_]: Concurrent: ContextShift: Timer: Trace](
+    config: Configuration,
+    client: Client[F],
+    consumerStream: TracedStream[F, CommittableConsumerRecord[F, String, String]]
+) {
 
   private implicit val clock: Clock[F] = Clock.create
 
